@@ -1,0 +1,10 @@
+//Test script for Applet 'DHApplet'
+
+powerup;
+// Select DHApplet //aid/EDE4FBEB9E/D8
+0x00 0xA4 0x04 0x00 0X06 0XED 0XE4 0XFB 0XEB 0X9E 0XD9 0x7F;
+
+//Send the APDU here
+//0x80 0xCA 0x00 0x00 <length> <data> 0x7F;
+
+powerdown;
