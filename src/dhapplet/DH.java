@@ -245,6 +245,7 @@ public class DH {
      * @return
      */
     public void getG(byte[] output, short offset) {
+        ArrayLogic.arrayCopyRepackNonAtomic(G, (short) 0, maxLength, output, offset);
     }
 
     /**
@@ -253,6 +254,7 @@ public class DH {
      * @return
      */
     public void getP(byte[] output, short offset) {
+        ArrayLogic.arrayCopyRepackNonAtomic(P, (short) 0, maxLength, output, offset);
     }
 
     /**
@@ -261,22 +263,6 @@ public class DH {
      * @return
      */
     public void getY(byte[] output, short offset) {
-    }
-
-    /**
-     * Set P value.
-     *
-     * @param data
-     * @param offset
-     * @param length
-     * @param targetOffset
-     * @throws ArrayIndexOutOfBoundsException
-     * @throws NullPointerException
-     * @throws TransactionException
-     * @throws UtilException
-     */
-    public void setP(byte[] data, short offset, short length, short targetOffset) throws ArrayIndexOutOfBoundsException, NullPointerException, TransactionException, UtilException {
-        ArrayLogic.arrayCopyRepack(data, offset, length, P, targetOffset);
     }
 
     /**
@@ -291,8 +277,40 @@ public class DH {
      * @throws TransactionException
      * @throws UtilException
      */
-    public void setY(byte[] data, short offset, short length, short targetOffset) throws ArrayIndexOutOfBoundsException, NullPointerException, TransactionException, UtilException {
-        ArrayLogic.arrayCopyRepack(data, offset, length, Y, targetOffset);
+    public void setY(byte[] data, short offset, short length, short yOffset) throws ArrayIndexOutOfBoundsException, NullPointerException, TransactionException, UtilException {
+        ArrayLogic.arrayCopyRepack(data, offset, length, Y, yOffset);
+    }
+
+    /**
+     * Set P value.
+     *
+     * @param data
+     * @param offset
+     * @param length
+     * @param targetOffset
+     * @throws ArrayIndexOutOfBoundsException
+     * @throws NullPointerException
+     * @throws TransactionException
+     * @throws UtilException
+     */
+    public void setP(byte[] data, short offset, short length, short pOffset) throws ArrayIndexOutOfBoundsException, NullPointerException, TransactionException, UtilException {
+        ArrayLogic.arrayCopyRepack(data, offset, length, P, pOffset);
+    }
+
+    /**
+     * Set G value.
+     *
+     * @param data
+     * @param offset
+     * @param length
+     * @param targetOffset
+     * @throws ArrayIndexOutOfBoundsException
+     * @throws NullPointerException
+     * @throws TransactionException
+     * @throws UtilException
+     */
+    public void setG(byte[] data, short offset, short length, short gOffset) throws ArrayIndexOutOfBoundsException, NullPointerException, TransactionException, UtilException {
+        ArrayLogic.arrayCopyRepack(data, offset, length, G, gOffset);
     }
 
     /**

@@ -34,6 +34,8 @@ package dhapplet;
 import javacard.framework.*;
 import javacard.security.AESKey;
 import javacard.security.KeyBuilder;
+import javacardx.crypto.Cipher;
+import javacardx.framework.util.ArrayLogic;
 
 /**
  * A Diffie-Hellman sample applet that uses the card's RNG to generate a 2048
@@ -72,7 +74,12 @@ public class DHApplet extends Applet {
 
     //Variables
     public DH dh;
-    private AESKey encKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES_TRANSIENT_RESET, KeyBuilder.LENGTH_AES_128, false);
+    private final AESKey encKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES_TRANSIENT_RESET, KeyBuilder.LENGTH_AES_128, false);
+    public final byte[] buffer = JCSystem.makeTransientByteArray(DH.maxLength, JCSystem.CLEAR_ON_RESET);
+    private final Cipher aesCipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_ECB_NOPAD, false);
+    public final byte[] reply = {(byte) 0x48, (byte) 0x65, (byte) 0x6c, (byte) 0x6c,
+        (byte) 0x6f, (byte) 0x20, (byte) 0x4a, (byte) 0x61, (byte) 0x76, (byte) 0x61,
+        (byte) 0x20, (byte) 0x43, (byte) 0x61, (byte) 0x72, (byte) 0x64, (byte) 0x2e};
 
     /**
      * Installs this applet.
@@ -111,45 +118,59 @@ public class DHApplet extends Applet {
             return;
         }
 
-        byte[] buffer = apdu.getBuffer();
+        byte[] apduBuffer = apdu.getBuffer();
 
-        if (buffer[ISO7816.OFFSET_CLA] == CLA) {
-            switch (buffer[ISO7816.OFFSET_INS]) {
+        if (apduBuffer[ISO7816.OFFSET_CLA] == CLA) {
+            switch (apduBuffer[ISO7816.OFFSET_INS]) {
                 case INS_INIT:
                     dh.init();
                     return;
 
                 case INS_GET:
-                    if (buffer[ISO7816.OFFSET_P1] == P1_Y) {
-                        
-                    } else if (buffer[ISO7816.OFFSET_P1] == P1_P) {
-
-                    } else if (buffer[ISO7816.OFFSET_P1] == P1_G) {
-
+                    if (apduBuffer[ISO7816.OFFSET_P1] == P1_Y) {
+                        apdu.setOutgoing();
+                        apdu.setOutgoingLength(DH.maxLength);
+                        dh.getY(apduBuffer, (short) 0);
+                        apdu.sendBytesLong(apduBuffer, (short) 0, DH.maxLength);
+                    } else if (apduBuffer[ISO7816.OFFSET_P1] == P1_P) {
+                        apdu.setOutgoing();
+                        apdu.setOutgoingLength(DH.maxLength);
+                        dh.getP(apduBuffer, (short) 0);
+                        apdu.sendBytesLong(apduBuffer, (short) 0, DH.maxLength);
+                    } else if (apduBuffer[ISO7816.OFFSET_P1] == P1_G) {
+                        apdu.setOutgoing();
+                        apdu.setOutgoingLength(DH.maxLength);
+                        dh.getG(apduBuffer, (short) 0);
+                        apdu.sendBytesLong(apduBuffer, (short) 0, DH.maxLength);
                     } else {
                         ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
                     }
                     return;
 
                 case INS_SET:
-                    if (buffer[ISO7816.OFFSET_P1] == P1_Y) {
-
-                    } else if (buffer[ISO7816.OFFSET_P1] == P1_P) {
-
-                    } else if (buffer[ISO7816.OFFSET_P1] == P1_G) {
-
+                    if (apduBuffer[ISO7816.OFFSET_P1] == P1_Y) {
+                        dh.setY(apduBuffer, ISO7816.OFFSET_CDATA, DH.maxLength, (short) 0);
+                    } else if (apduBuffer[ISO7816.OFFSET_P1] == P1_P) {
+                        dh.setP(apduBuffer, ISO7816.OFFSET_CDATA, DH.maxLength, (short) 0);
+                    } else if (apduBuffer[ISO7816.OFFSET_P1] == P1_G) {
+                        dh.setG(apduBuffer, ISO7816.OFFSET_CDATA, DH.maxLength, (short) 0);
                     } else {
                         ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
                     }
                     return;
-                    
+
                 case INS_FINAL:
                     dh.doFinal(encKey);
                     return;
 
                 case INS_TEST:
+                    aesCipher.init(encKey, Cipher.MODE_ENCRYPT);
+                    aesCipher.doFinal(reply, (short) 0, (short) reply.length, buffer, (short) 0);
+                    apdu.setOutgoing();
+                    apdu.setOutgoingLength((short) reply.length);
+                    apdu.sendBytesLong(buffer, (short) 0, (short) reply.length);
                     return;
-                    
+
                 default:
                     ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
             }
