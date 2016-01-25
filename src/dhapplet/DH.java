@@ -240,6 +240,25 @@ public class DH {
     }
 
     /**
+     * Initializes the DH "public key" value of Y while also specifying one's
+     * choice of private key value. Useful for scenarios where manually loading
+     * the DH private key is needed instead of on-board key generation.
+     */
+    public void init(byte[] privateKey, short offset) {
+        // Load DH's P as RSA's M
+        dhPriv.setModulus(P, (short) 0, maxLength);
+
+        // Load DH private key value as RSA's E
+        dhPriv.setExponent(privateKey, offset, maxLength);
+
+        // Set private key into cipher
+        dhCipher.init(dhPriv, Cipher.MODE_ENCRYPT);
+
+        // Execute Y = G^bobPrivKey mod P via RSA's encrypt
+        dhCipher.doFinal(G, (short) 0, maxLength, Y, (short) 0);
+    }
+
+    /**
      * Get G value.
      *
      * @return

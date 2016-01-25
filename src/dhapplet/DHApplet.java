@@ -70,6 +70,7 @@ public class DHApplet extends Applet {
     public final static byte P1_Y = (byte) 0x01;
     public final static byte P1_P = (byte) 0x02;
     public final static byte P1_G = (byte) 0x03;
+    public final static byte P1_INIT_WITH_PRIVKEY = (byte) 0x1F;
     public final static byte BLANK = (byte) 0x00;
 
     //Variables
@@ -123,7 +124,11 @@ public class DHApplet extends Applet {
         if (apduBuffer[ISO7816.OFFSET_CLA] == CLA) {
             switch (apduBuffer[ISO7816.OFFSET_INS]) {
                 case INS_INIT:
-                    dh.init();
+                    if (apduBuffer[ISO7816.OFFSET_P1] == P1_INIT_WITH_PRIVKEY) {
+                        dh.init(apduBuffer, ISO7816.OFFSET_CDATA);
+                    } else {
+                        dh.init();
+                    }
                     return;
 
                 case INS_GET:
