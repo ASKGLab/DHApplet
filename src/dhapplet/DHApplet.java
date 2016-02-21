@@ -31,11 +31,15 @@
  */
 package dhapplet;
 
+import java.io.IOException;
 import javacard.framework.*;
 import javacard.security.AESKey;
+import javacard.security.CryptoException;
 import javacard.security.KeyBuilder;
 import javacardx.crypto.Cipher;
+import javacardx.external.ExternalException;
 import javacardx.framework.util.ArrayLogic;
+import javacardx.framework.util.UtilException;
 
 /**
  * A Diffie-Hellman sample applet that uses the card's RNG to generate a 2048
@@ -120,7 +124,6 @@ public class DHApplet extends Applet {
         }
 
         byte[] apduBuffer = apdu.getBuffer();
-
         if (apduBuffer[ISO7816.OFFSET_CLA] == CLA) {
             switch (apduBuffer[ISO7816.OFFSET_INS]) {
                 case INS_INIT:
@@ -130,7 +133,6 @@ public class DHApplet extends Applet {
                         dh.init();
                     }
                     return;
-
                 case INS_GET:
                     if (apduBuffer[ISO7816.OFFSET_P1] == P1_Y) {
                         apdu.setOutgoing();

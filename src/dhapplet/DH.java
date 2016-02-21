@@ -31,13 +31,22 @@
  */
 package dhapplet;
 
+import java.io.IOException;
+import javacard.framework.APDUException;
+import javacard.framework.CardException;
+import javacard.framework.CardRuntimeException;
+import javacard.framework.ISOException;
 import javacard.framework.JCSystem;
+import javacard.framework.SystemException;
 import javacard.framework.TransactionException;
+import javacard.framework.UserException;
 import javacard.security.AESKey;
+import javacard.security.CryptoException;
 import javacard.security.KeyBuilder;
 import javacard.security.KeyPair;
 import javacard.security.RSAPrivateKey;
 import javacardx.crypto.Cipher;
+import javacardx.external.ExternalException;
 import javacardx.framework.util.ArrayLogic;
 import javacardx.framework.util.UtilException;
 
@@ -151,62 +160,7 @@ public class DH {
     };
 
     public static final short maxLength = 256;
-
-    private byte[] G = {
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x02
-    };
-
+    private byte[] G = new byte[maxLength];
     private byte[] Y = JCSystem.makeTransientByteArray(maxLength, JCSystem.CLEAR_ON_RESET);
     private byte[] S = JCSystem.makeTransientByteArray(maxLength, JCSystem.CLEAR_ON_RESET);
 
@@ -216,6 +170,9 @@ public class DH {
 
         // Creates an RSA cipher instance
         dhCipher = Cipher.getInstance(Cipher.ALG_RSA_NOPAD, false);
+
+        // Set default G to 2
+        G[(short) (maxLength - 1)] = (byte) 0x02;
     }
 
     /**
@@ -223,6 +180,7 @@ public class DH {
      */
     public void init() {
         // Create a keypair instance using an RSA keypair as template
+
         KeyPair dhKeyPair = new KeyPair(KeyPair.ALG_RSA, (short) dhPriv.getSize());
 
         // Gen DH private key
@@ -233,9 +191,9 @@ public class DH {
         dhPriv.setModulus(P, (short) 0, maxLength);
 
         // Set private key into cipher
-        dhCipher.init(dhPriv, Cipher.MODE_ENCRYPT);
+        dhCipher.init(dhPriv, Cipher.MODE_DECRYPT);
 
-        // Execute Y = G^bobPrivKey mod P via RSA's encrypt
+        // Execute Y = G^bobPrivKey mod P via RSA's decrypt
         dhCipher.doFinal(G, (short) 0, maxLength, Y, (short) 0);
     }
 
@@ -252,9 +210,9 @@ public class DH {
         dhPriv.setExponent(privateKey, offset, maxLength);
 
         // Set private key into cipher
-        dhCipher.init(dhPriv, Cipher.MODE_ENCRYPT);
+        dhCipher.init(dhPriv, Cipher.MODE_DECRYPT);
 
-        // Execute Y = G^bobPrivKey mod P via RSA's encrypt
+        // Execute Y = G^bobPrivKey mod P via RSA's decrypt
         dhCipher.doFinal(G, (short) 0, maxLength, Y, (short) 0);
     }
 
@@ -282,6 +240,7 @@ public class DH {
      * @return
      */
     public void getY(byte[] output, short offset) {
+        ArrayLogic.arrayCopyRepackNonAtomic(Y, (short) 0, maxLength, output, offset);
     }
 
     /**
@@ -356,9 +315,9 @@ public class DH {
      */
     public void doFinal(AESKey encKey) {
         // Set private key into cipher
-        dhCipher.init(dhPriv, Cipher.MODE_ENCRYPT);
+        dhCipher.init(dhPriv, Cipher.MODE_DECRYPT);
 
-        // Execute S = Y^a mod p via RSA's encrypt
+        // Execute S = Y^a mod p via RSA's decrypt
         dhCipher.doFinal(Y, (short) 0, maxLength, S, (short) 0);
 
         // Set session Encryption key
